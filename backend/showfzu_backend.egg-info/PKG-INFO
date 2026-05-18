@@ -1,0 +1,25 @@
+Metadata-Version: 2.4
+Name: showfzu-backend
+Version: 0.1.0
+Summary: FastAPI backend for the ShowFZU campus community.
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+Requires-Dist: alembic>=1.16.5
+Requires-Dist: fastapi>=0.116.1
+Requires-Dist: pillow>=11.3.0
+Requires-Dist: psycopg[binary]>=3.2.12
+Requires-Dist: pwdlib[argon2]>=0.2.1
+Requires-Dist: pydantic-settings>=2.11.0
+Requires-Dist: python-multipart>=0.0.20
+Requires-Dist: sqlalchemy>=2.0.44
+Requires-Dist: supabase>=2.24.0
+Requires-Dist: uvicorn[standard]>=0.38.0
+Provides-Extra: dev
+Requires-Dist: httpx>=0.28.1; extra == "dev"
+Requires-Dist: pytest>=8.4.2; extra == "dev"
+Requires-Dist: pytest-cov>=7.0.0; extra == "dev"
+
+# ShowFZU Backend
+
+FastAPI service for the ShowFZU campus showcase and community site.
+

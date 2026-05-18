@@ -1,0 +1,16 @@
+{
+  "name": "showfzu",
+  "private": true,
+  "workspaces": [
+    "frontend"
+  ],
+  "scripts": {
+    "install:frontend": "npm --workspace frontend install",
+    "dev:frontend": "npm --workspace frontend run dev",
+    "build:frontend": "npm --workspace frontend run build",
+    "lint:frontend": "npm --workspace frontend run lint"
+  },
+  "devDependencies": {
+    "@typescript-eslint/scope-manager": "^8.59.3"
+  }
+}

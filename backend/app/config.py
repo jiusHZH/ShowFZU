@@ -1,0 +1,58 @@
+from __future__ import annotations
+
+from functools import lru_cache
+
+from pydantic import Field, field_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+    app_name: str = "ShowFZU API"
+    env: str = "development"
+    database_url: str = Field(
+        default="postgresql+psycopg://postgres:password@localhost:5432/showfzu"
+    )
+    session_secret: str = "replace-me"
+    session_cookie_name: str = "showfzu_session"
+    session_max_age_seconds: int = 60 * 60 * 24 * 7
+    cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:5173"])
+    public_base_url: str = "http://localhost:5173"
+    supabase_url: str | None = None
+    supabase_service_key: str | None = None
+    storage_posts_bucket: str = "post-media"
+    storage_avatars_bucket: str = "avatars"
+    storage_guide_bucket: str = "official-guide"
+    secure_cookies: bool = False
+
+    model_config = SettingsConfigDict(
+        env_prefix="SHOWFZU_",
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+        extra="ignore",
+    )
+
+    @field_validator("cors_origins", mode="before")
+    @classmethod
+    def parse_cors_origins(cls, value: object) -> object:
+        if isinstance(value, str):
+            return [item.strip() for item in value.split(",") if item.strip()]
+        return value
+
+    @property
+    def is_production(self) -> bool:
+        return self.env.lower() == "production"
+
+    @property
+    def default_cover_url(self) -> str:
+        return f"{self.public_base_url.rstrip('/')}/default-cover.svg"
+
+    @property
+    def storage_enabled(self) -> bool:
+        return bool(self.supabase_url and self.supabase_service_key)
+
+
+@lru_cache
+def get_settings() -> Settings:
+    return Settings()
+

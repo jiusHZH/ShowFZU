@@ -1,0 +1,68 @@
+{
+  "hero": {
+    "title": "Official FZU Introduction",
+    "subtitle": "A photography-led introduction to campus architecture, study spaces, and waterside landmarks.",
+    "imageUrl": "/official-guide/hero-library-night.jpg",
+    "imageAlt": "The Fuzhou University Library reflected in the campus water at dusk."
+  },
+  "items": [
+    {
+      "id": "main-gate",
+      "name": "Fuzhou University Main Gate",
+      "description": "The main gate of Fuzhou University (Qishan Campus) serves as the iconic entrance to the university. Featuring the university name inscribed on a grand stone monument, it embodies the university motto 'Ming De Zhi Cheng, Bo Xue Yuan Zhi' (Illustrious Virtue and Absolute Sincerity, Broad Learning and Lofty Aspiration). The gate stands as a symbol of the university's heritage and academic excellence since its founding in 1958.",
+      "atmosphere": "A ceremonial threshold where the university introduces itself through stone, sky, and mountain distance.",
+      "imageUrl": "/official-guide/main-gate.jpg",
+      "imageAlt": "The stone monument and entry landscape at Fuzhou University Main Gate.",
+      "sortOrder": 1
+    },
+    {
+      "id": "library",
+      "name": "Fuzhou University Library",
+      "description": "The Fuzhou University Library is an award-winning architectural masterpiece, recipient of the prestigious Luban Prize (China's highest construction award) in 2008. Located at the campus center, this 35,500 square-meter modern building features a distinctive square design inspired by traditional Fujian tulou architecture. Housing over 3.8 million printed volumes and 9.3 million e-books, it stands as one of China's Top 50 Most Beautiful University Libraries.",
+      "atmosphere": "Formal, reflective, and quietly luminous, the library frames study as both architecture and ritual.",
+      "imageUrl": "/official-guide/library.jpg",
+      "imageAlt": "The Fuzhou University Library reflected in the water at dusk.",
+      "sortOrder": 2
+    },
+    {
+      "id": "jinjiang-building",
+      "name": "Jinjiang Building",
+      "description": "Jinjiang Building is the landmark 100-meter tower located at the east entrance of Qishan Campus. As a symbol of university-local government collaboration, this state-of-the-art research complex houses graduate research facilities, academic exhibition halls, and the University History Museum. Its modern architectural design embodies the principles of freedom, rigor, cultural heritage, and spatial harmony.",
+      "atmosphere": "A vertical landmark that gives the campus skyline a crisp contemporary silhouette.",
+      "imageUrl": "/official-guide/jinjiang-building.jpg",
+      "imageAlt": "Jinjiang Building rising above trees and water under a clear sky.",
+      "sortOrder": 3
+    },
+    {
+      "id": "fuyou-pavilion",
+      "name": "Fuyou Pavilion",
+      "description": "Fuyou Pavilion is a traditional Chinese-style pavilion situated by the campus lake, surrounded by lotus ponds and scenic landscapes. This elegant structure serves as a creative hub and maker space for students, combining classical Chinese architectural aesthetics with modern innovation functions. Its name, derived from 'Cultivating Virtue and Fostering Friendship', reflects the university's humanistic spirit.",
+      "atmosphere": "The pavilion softens the campus rhythm with water, lotus textures, and a traditional roofline.",
+      "imageUrl": "/official-guide/fuyou-pavilion.jpg",
+      "imageAlt": "Fuyou Pavilion surrounded by lotus leaves in daylight.",
+      "sortOrder": 4
+    },
+    {
+      "id": "honghui-complex",
+      "name": "Honghui Sports and Culture Complex",
+      "description": "Honghui Sports and Culture Complex is a multi-functional venue integrating sports facilities, auditorium spaces, and cultural activity centers. Located near the south campus gate, this modern geometric building hosts graduation ceremonies, academic conferences, sporting events, and artistic performances. Its distinctive angular design symbolizes the perseverance and determination of FZU students.",
+      "atmosphere": "Angular and public-facing, the complex brings ceremony, performance, and movement into one volume.",
+      "imageUrl": "/official-guide/honghui-complex.jpg",
+      "imageAlt": "The geometric facade of the Honghui Sports and Culture Complex.",
+      "sortOrder": 5
+    },
+    {
+      "id": "campus-lake-view",
+      "name": "FZU Campus Lake View",
+      "description": "The scenic campus lake at Fuzhou University offers breathtaking views with building reflections creating perfect mirror images on the water surface. Surrounded by lush greenery and set against the backdrop of mountains, this natural landscape provides a serene environment for study and relaxation. The harmonious integration of architecture and nature exemplifies FZU's beautiful campus environment.",
+      "atmosphere": "Calm water and mirrored forms let the campus read as a single, composed landscape.",
+      "imageUrl": "/official-guide/campus-lake-view.jpg",
+      "imageAlt": "Campus architecture reflected across the still surface of the lake.",
+      "sortOrder": 6
+    }
+  ],
+  "sourceDocs": [
+    "FZU_Campus_Architecture.docx - 福州大学校园建筑Word文档.docx",
+    "照片（图书馆，卧龙桥，旋转楼梯，东门）.docx"
+  ]
+}

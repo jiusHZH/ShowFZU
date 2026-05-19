@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import Settings, get_settings
-from app.database import build_session_factory
+from app.database import build_session_factory, initialize_database
 from app.routers import auth, posts, users
 from app.services.storage import SupabaseStorageService
 
@@ -15,6 +15,11 @@ def create_app(
     storage_service: SupabaseStorageService | None = None,
 ) -> FastAPI:
     settings = settings or get_settings()
+    if settings.database_url.startswith("sqlite"):
+        import app.models  # noqa: F401
+
+        initialize_database(settings.database_url)
+
     app = FastAPI(title=settings.app_name)
 
     app.state.settings = settings

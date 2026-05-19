@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import shutil
-import subprocess
 import sys
 from pathlib import Path
 from zipfile import ZipFile
@@ -88,7 +87,8 @@ CATEGORY_IMAGE_SOURCES = {
     "digital-memory.jpg": RESOURCE_DIR / "FZU_Images_Collection.zip - 福州大学图片合集压缩包" / "fzu_images" / "campus_fountain.jpg",
 }
 
-FOOD_VIDEO_SOURCE = RESOURCE_DIR / "Food_ Diary.mp4"
+POST_EXAMPLES_DOC = RESOURCE_DIR / "发帖（学习空间，美食，校园记忆）.docx"
+FOOD_CATEGORY_DOCX_MEDIA_PATH = "word/media/image10.jpeg"
 
 
 def extract_docx_lines(path: Path) -> list[str]:
@@ -142,25 +142,10 @@ def copy_file(source: Path, destination: Path) -> None:
     shutil.copy2(source, destination)
 
 
-def extract_video_frame(source: Path, destination: Path, capture_seconds: int) -> None:
+def extract_docx_media_file(source_doc: Path, media_member_path: str, destination: Path) -> None:
     destination.parent.mkdir(parents=True, exist_ok=True)
-    subprocess.run(
-        [
-            "ffmpeg",
-            "-y",
-            "-ss",
-            str(capture_seconds),
-            "-i",
-            str(source),
-            "-frames:v",
-            "1",
-            "-q:v",
-            "2",
-            str(destination),
-        ],
-        check=True,
-        capture_output=True,
-    )
+    with ZipFile(source_doc) as archive:
+        destination.write_bytes(archive.read(media_member_path))
 
 
 def build_official_guide() -> None:
@@ -173,7 +158,7 @@ def build_official_guide() -> None:
 
     for image_name, source in CATEGORY_IMAGE_SOURCES.items():
         copy_file(source, CATEGORY_DIR / image_name)
-    extract_video_frame(FOOD_VIDEO_SOURCE, CATEGORY_DIR / "food-and-cafe.jpg", capture_seconds=40)
+    extract_docx_media_file(POST_EXAMPLES_DOC, FOOD_CATEGORY_DOCX_MEDIA_PATH, CATEGORY_DIR / "food-and-cafe.jpg")
 
     items = []
     for sort_order, item in enumerate(OFFICIAL_GUIDE_PLAN, start=1):

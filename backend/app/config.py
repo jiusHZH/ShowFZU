@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from functools import lru_cache
 
 from pydantic import Field, field_validator
@@ -9,14 +10,12 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     app_name: str = "ShowFZU API"
     env: str = "development"
-    database_url: str = Field(
-        default="postgresql+psycopg://postgres:password@localhost:5432/showfzu"
-    )
+    database_url: str = Field(default="sqlite:///./showfzu.dev.db")
     session_secret: str = "replace-me"
     session_cookie_name: str = "showfzu_session"
     session_max_age_seconds: int = 60 * 60 * 24 * 7
-    cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:5173"])
-    public_base_url: str = "http://localhost:5173"
+    cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:5173", "http://127.0.0.1:5173"])
+    public_base_url: str = "http://127.0.0.1:5173"
     supabase_url: str | None = None
     supabase_service_key: str | None = None
     storage_posts_bucket: str = "post-media"
@@ -30,12 +29,16 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",
+        enable_decoding=False,
     )
 
     @field_validator("cors_origins", mode="before")
     @classmethod
     def parse_cors_origins(cls, value: object) -> object:
         if isinstance(value, str):
+            trimmed = value.strip()
+            if trimmed.startswith("["):
+                return json.loads(trimmed)
             return [item.strip() for item in value.split(",") if item.strip()]
         return value
 
@@ -55,4 +58,3 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
-

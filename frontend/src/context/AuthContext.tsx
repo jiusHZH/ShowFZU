@@ -23,6 +23,10 @@ export function AuthProvider({ children }: PropsWithChildren) {
         if (mounted) {
           setUser(session.user)
         }
+      } catch {
+        if (mounted) {
+          setUser(null)
+        }
       } finally {
         if (mounted) {
           setIsLoading(false)

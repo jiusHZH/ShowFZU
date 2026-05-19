@@ -28,6 +28,12 @@ class SupabaseStorageService:
         if settings.storage_enabled:
             self.client = create_client(settings.supabase_url, settings.supabase_service_key)
 
+    def _resolve_local_demo_path(self, storage_path: str | None) -> Path | None:
+        if not storage_path or not storage_path.startswith("local-demo/"):
+            return None
+        relative_path = storage_path.removeprefix("local-demo/")
+        return Path(__file__).resolve().parents[3] / "frontend" / "public" / relative_path
+
     def _require_client(self) -> Client:
         if self.client is None:
             raise StorageServiceError("Media storage is not configured.")
@@ -85,6 +91,10 @@ class SupabaseStorageService:
     def remove_object(self, bucket: str, storage_path: str | None) -> None:
         if not storage_path:
             return
+        local_demo_path = self._resolve_local_demo_path(storage_path)
+        if local_demo_path is not None:
+            if local_demo_path.exists():
+                local_demo_path.unlink()
+            return
         client = self._require_client()
         client.storage.from_(bucket).remove([storage_path])
-

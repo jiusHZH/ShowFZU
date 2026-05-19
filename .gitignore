@@ -19,8 +19,11 @@ backend/.venv/
 backend/.mypy_cache/
 backend/.coverage
 backend/htmlcov/
+backend/showfzu.dev.db
+backend/.pytest_tmp/
 
 coverage/
 .playwright-mcp/
 *.tgz
 backend/.local-browser.db
+frontend/public/demo-posts/

@@ -5,8 +5,10 @@
     "frontend"
   ],
   "scripts": {
+    "dev:backend": "cmd /c \"cd backend && .\\.venv\\Scripts\\python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload\"",
     "install:frontend": "npm --workspace frontend install",
     "dev:frontend": "npm --workspace frontend run dev",
+    "seed:demo": "cmd /c \"cd backend && .\\.venv\\Scripts\\python ..\\scripts\\seed_demo_content.py\"",
     "build:frontend": "npm --workspace frontend run build",
     "lint:frontend": "npm --workspace frontend run lint"
   },

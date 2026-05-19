@@ -24,6 +24,16 @@ export class ApiError extends Error {
   }
 }
 
+function getInfrastructureErrorMessage(status: number) {
+  if (status === 502 || status === 503 || status === 504) {
+    return 'ShowFZU could not reach the server. Please try again in a moment.'
+  }
+  if (status >= 500) {
+    return 'ShowFZU hit a server error. Please try again in a moment.'
+  }
+  return null
+}
+
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const headers = new Headers(init?.headers)
   const isFormData = init?.body instanceof FormData
@@ -31,11 +41,16 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
     headers.set('Content-Type', 'application/json')
   }
 
-  const response = await fetch(`${API_BASE}${path}`, {
-    credentials: 'include',
-    ...init,
-    headers,
-  })
+  let response: Response
+  try {
+    response = await fetch(`${API_BASE}${path}`, {
+      credentials: 'include',
+      ...init,
+      headers,
+    })
+  } catch {
+    throw new ApiError(0, 'ShowFZU could not reach the server. Please try again in a moment.')
+  }
 
   const contentType = response.headers.get('content-type') ?? ''
   const payload = contentType.includes('application/json')
@@ -43,10 +58,12 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
     : await response.text()
 
   if (!response.ok) {
+    const infrastructureMessage = getInfrastructureErrorMessage(response.status)
     const message =
-      typeof payload === 'object' && payload && 'detail' in payload
+      infrastructureMessage ??
+      ((typeof payload === 'object' && payload && 'detail' in payload)
         ? String(payload.detail)
-        : response.statusText || 'Request failed'
+        : response.statusText || 'Request failed')
     throw new ApiError(response.status, message)
   }
 
@@ -231,4 +248,3 @@ export function getPublicUserPosts(userId: string) {
 export function ensurePostSummaries(response: PaginatedPosts | { items: PostSummary[] }) {
   return response.items
 }
-

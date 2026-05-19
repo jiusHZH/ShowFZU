@@ -26,3 +26,7 @@ def build_session_factory(database_url: str) -> sessionmaker:
     engine = build_engine(database_url)
     return sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=False)
 
+
+def initialize_database(database_url: str) -> None:
+    engine = build_engine(database_url)
+    Base.metadata.create_all(engine)

@@ -770,6 +770,33 @@ h3 {
   gap: 1rem;
 }
 
+.editor-layout {
+  align-items: start;
+}
+
+.editor-layout > .page-intro {
+  align-self: center;
+  justify-content: flex-start;
+  max-width: none;
+  padding: clamp(1.5rem, 3vw, 2.2rem);
+  border: 1px solid rgba(125, 17, 24, 0.12);
+  border-radius: 1.8rem;
+  background:
+    radial-gradient(circle at top right, rgba(242, 196, 111, 0.16), transparent 34%),
+    linear-gradient(140deg, #fff9f8 0%, #fff0ee 100%);
+  box-shadow: 0 18px 46px rgba(93, 8, 15, 0.08);
+}
+
+.editor-layout > .page-intro h1 {
+  max-width: 16ch;
+  margin-bottom: 0.35rem;
+}
+
+.editor-layout > .page-intro p {
+  max-width: 42ch;
+  line-height: 1.7;
+}
+
 .auth-panel--accent {
   background:
     linear-gradient(180deg, rgba(92, 10, 15, 0.92), rgba(151, 20, 30, 0.88)),

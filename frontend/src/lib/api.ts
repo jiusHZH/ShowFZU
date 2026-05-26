@@ -24,11 +24,11 @@ export class ApiError extends Error {
   }
 }
 
-function getInfrastructureErrorMessage(status: number) {
-  if (status === 502 || status === 503 || status === 504) {
+function getInfrastructureErrorMessage(status: number, hasApiMessage: boolean) {
+  if (status === 502 || status === 504 || (status === 503 && !hasApiMessage)) {
     return 'ShowFZU could not reach the server. Please try again in a moment.'
   }
-  if (status >= 500) {
+  if (status >= 500 && !(status === 503 && hasApiMessage)) {
     return 'ShowFZU hit a server error. Please try again in a moment.'
   }
   return null
@@ -81,8 +81,9 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
     : await response.text()
 
   if (!response.ok) {
-    const infrastructureMessage = getInfrastructureErrorMessage(response.status)
-    const message = infrastructureMessage ?? getApiErrorMessage(payload, response.statusText || 'Request failed')
+    const apiMessage = getApiErrorMessage(payload, '')
+    const infrastructureMessage = getInfrastructureErrorMessage(response.status, Boolean(apiMessage))
+    const message = infrastructureMessage ?? (apiMessage || response.statusText || 'Request failed')
     throw new ApiError(response.status, message)
   }
 

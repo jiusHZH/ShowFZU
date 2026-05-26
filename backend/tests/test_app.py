@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from app.validation import MAX_VIDEO_SIZE_BYTES
+
 
 def register_user(client, *, account_id: str, username: str, password: str = "Password123") -> None:
     response = client.post(
@@ -127,3 +129,24 @@ def test_authenticated_content_flow(client, sample_image_bytes: bytes) -> None:
 
     blocked_like = client.post(f"/api/posts/{post_id}/like")
     assert blocked_like.status_code == 401
+
+
+def test_rejects_video_over_25_mb_before_upload(client) -> None:
+    assert MAX_VIDEO_SIZE_BYTES == 25 * 1024 * 1024
+    register_user(client, account_id="23456789", username="Video Tester")
+    login_user(client, method="username", identifier="Video Tester")
+
+    response = client.post(
+        "/api/posts",
+        data={
+            "title": "Oversized video",
+            "category": "Digital Memory",
+            "body": "",
+        },
+        files={
+            "video": ("large.mp4", b"0" * (MAX_VIDEO_SIZE_BYTES + 1), "video/mp4"),
+        },
+    )
+
+    assert response.status_code == 422, response.text
+    assert response.json()["detail"] == "Video file is too large."

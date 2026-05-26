@@ -21,6 +21,8 @@ class Settings(BaseSettings):
     storage_posts_bucket: str = "post-media"
     storage_avatars_bucket: str = "avatars"
     storage_guide_bucket: str = "official-guide"
+    ffmpeg_path: str = "ffmpeg"
+    ffprobe_path: str = "ffprobe"
     secure_cookies: bool = False
 
     model_config = SettingsConfigDict(

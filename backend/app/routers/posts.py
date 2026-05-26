@@ -73,7 +73,7 @@ def _normalize_video(video: UploadFile | None) -> UploadFile | None:
 def _validate_textual_fields(title: str, body: str | None, category: str) -> tuple[str, str | None, PostCategory]:
     title = title.strip()
     if not title:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Title is required.")
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Title is required.")
     body = clean_text(body)
     parsed_category = parse_category(category)
     return title, body, parsed_category
@@ -186,10 +186,10 @@ def create_post(
     video_size = validate_video_upload(normalized_video) if normalized_video else 0
     total_media_size = sum(image_sizes) + video_size
     if total_media_size > MAX_TOTAL_POST_MEDIA_BYTES:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Total post media is too large.")
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Total post media is too large.")
     if not body and not normalized_images and not normalized_video:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Post body, images, or video is required.",
         )
 
@@ -239,7 +239,11 @@ def create_post(
                 normalized_video,
             )
             created_objects.append(video_storage_path)
-            thumbnail_bytes = extract_video_thumbnail_bytes(normalized_video)
+            thumbnail_bytes = extract_video_thumbnail_bytes(
+                normalized_video,
+                ffmpeg_path=storage_service.settings.ffmpeg_path,
+                ffprobe_path=storage_service.settings.ffprobe_path,
+            )
             stored_thumbnail = storage_service.upload_bytes(
                 storage_service.settings.storage_posts_bucket,
                 thumbnail_storage_path,
@@ -307,11 +311,11 @@ def update_post(
         kept_images = sorted(current_images, key=lambda item: item.sort_order)
     else:
         if len(requested_image_ids) != len(set(requested_image_ids)):
-            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Duplicate image IDs are not allowed.")
+            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Duplicate image IDs are not allowed.")
         image_map = {media.id: media for media in current_images}
         missing_ids = [media_id for media_id in requested_image_ids if media_id not in image_map]
         if missing_ids:
-            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Unknown image ID in existing_image_ids.")
+            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Unknown image ID in existing_image_ids.")
         kept_images = [image_map[media_id] for media_id in requested_image_ids]
 
     removed_images = [media for media in current_images if media not in kept_images]
@@ -327,10 +331,10 @@ def update_post(
         + new_video_size
     )
     if final_media_size > MAX_TOTAL_POST_MEDIA_BYTES:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Total post media is too large.")
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Total post media is too large.")
     if not body and not kept_images and not keeping_video and not normalized_images and not normalized_video:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Post body, images, or video is required.",
         )
 
@@ -374,7 +378,11 @@ def update_post(
                 normalized_video,
             )
             created_paths.append(video_storage_path)
-            thumbnail_bytes = extract_video_thumbnail_bytes(normalized_video)
+            thumbnail_bytes = extract_video_thumbnail_bytes(
+                normalized_video,
+                ffmpeg_path=storage_service.settings.ffmpeg_path,
+                ffprobe_path=storage_service.settings.ffprobe_path,
+            )
             stored_thumbnail = storage_service.upload_bytes(
                 storage_service.settings.storage_posts_bucket,
                 thumbnail_storage_path,
@@ -575,7 +583,7 @@ def create_reply(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Comment not found.")
     if parent.parent_id is not None:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Replies can only target main comments.",
         )
 

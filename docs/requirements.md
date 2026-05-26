@@ -412,9 +412,9 @@ Video upload:
 
 - Formats: mp4, webm, ogg, mov.
 - At most 1 video per post.
-- Video maximum size: 100MB.
+- Video maximum size: 25MB.
 - No server-side transcoding in MVP.
-- If video exceeds 100MB, tell user to compress it first.
+- If video exceeds 25MB, tell user to compress it first.
 
 Total post media size:
 
@@ -536,7 +536,7 @@ Initial demo data:
 Demo media:
 
 - Demo data must follow the same upload rules as user content.
-- Existing videos exceed the 100MB limit and must be compressed into Web versions before inclusion.
+- Existing videos exceed the 25MB limit and must be compressed into Web versions before inclusion.
 
 Current known videos:
 

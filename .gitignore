@@ -20,7 +20,7 @@ backend/.mypy_cache/
 backend/.coverage
 backend/htmlcov/
 backend/showfzu.dev.db
-backend/.pytest_tmp/
+backend/.pytest_*/
 
 coverage/
 .playwright-mcp/

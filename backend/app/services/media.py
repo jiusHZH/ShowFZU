@@ -13,7 +13,12 @@ class MediaProcessingError(RuntimeError):
     pass
 
 
-def extract_video_thumbnail_bytes(upload: UploadFile) -> bytes:
+def extract_video_thumbnail_bytes(
+    upload: UploadFile,
+    *,
+    ffmpeg_path: str = "ffmpeg",
+    ffprobe_path: str = "ffprobe",
+) -> bytes:
     if not upload.filename:
         raise MediaProcessingError("Video filename is missing.")
 
@@ -29,7 +34,7 @@ def extract_video_thumbnail_bytes(upload: UploadFile) -> bytes:
 
         duration_result = subprocess.run(
             [
-                "ffprobe",
+                ffprobe_path,
                 "-v",
                 "error",
                 "-show_entries",
@@ -50,7 +55,7 @@ def extract_video_thumbnail_bytes(upload: UploadFile) -> bytes:
 
         subprocess.run(
             [
-                "ffmpeg",
+                ffmpeg_path,
                 "-y",
                 "-ss",
                 f"{capture_time:.3f}",
@@ -67,7 +72,7 @@ def extract_video_thumbnail_bytes(upload: UploadFile) -> bytes:
         )
 
         return Path(output_path).read_bytes()
-    except subprocess.CalledProcessError as exc:
+    except (FileNotFoundError, subprocess.CalledProcessError) as exc:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to generate a video thumbnail.",
@@ -77,4 +82,3 @@ def extract_video_thumbnail_bytes(upload: UploadFile) -> bytes:
             os.remove(input_path)
         if output_path and os.path.exists(output_path):
             os.remove(output_path)
-

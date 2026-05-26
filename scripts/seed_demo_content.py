@@ -46,7 +46,7 @@ VIDEO_SOURCE_BY_NAME = {
 }
 
 LOCAL_DEMO_PREFIX = "local-demo/"
-VIDEO_TARGET_BYTES = 90 * 1024 * 1024
+VIDEO_TARGET_BYTES = 23 * 1024 * 1024
 PASSWORD = "CampusDemo123"
 SECURITY_QUESTION = "Favorite place on campus?"
 SECURITY_ANSWER = "Library"
@@ -295,10 +295,10 @@ def extract_docx_media_bytes(docx: Path, media_member: str) -> bytes:
         return archive.read(f"word/{media_member}")
 
 
-def probe_video_duration_seconds(source: Path) -> float:
+def probe_video_duration_seconds(source: Path, ffprobe_path: str) -> float:
     result = subprocess.run(
         [
-            "ffprobe",
+            ffprobe_path,
             "-v",
             "error",
             "-show_entries",
@@ -359,16 +359,16 @@ def build_demo_video_asset(
     output_path.parent.mkdir(parents=True, exist_ok=True)
     thumbnail_path.parent.mkdir(parents=True, exist_ok=True)
 
-    duration_seconds = probe_video_duration_seconds(source)
-    audio_bitrate = 128_000
-    total_bitrate = max(int((VIDEO_TARGET_BYTES * 8) / max(duration_seconds, 1)), 1_800_000)
-    video_bitrate = max(total_bitrate - audio_bitrate, 1_600_000)
+    duration_seconds = probe_video_duration_seconds(source, settings.ffprobe_path)
+    audio_bitrate = 96_000
+    total_bitrate = max(int((VIDEO_TARGET_BYTES * 8 * 0.94) / max(duration_seconds, 1)), 256_000)
+    video_bitrate = max(total_bitrate - audio_bitrate, 160_000)
     maxrate = int(video_bitrate * 1.15)
     bufsize = int(video_bitrate * 2)
 
     subprocess.run(
         [
-            "ffmpeg",
+            settings.ffmpeg_path,
             "-y",
             "-i",
             str(source),
@@ -405,7 +405,7 @@ def build_demo_video_asset(
     capture_time = max(duration_seconds / 2, 0.1)
     subprocess.run(
         [
-            "ffmpeg",
+            settings.ffmpeg_path,
             "-y",
             "-ss",
             f"{capture_time:.3f}",

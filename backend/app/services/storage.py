@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import os
-import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -42,20 +40,33 @@ class SupabaseStorageService:
     def build_public_url(self, bucket: str, storage_path: str) -> str:
         return f"{self.settings.supabase_url.rstrip('/')}/storage/v1/object/public/{bucket}/{storage_path}"
 
-    def upload_upload_file(self, bucket: str, storage_path: str, upload: UploadFile) -> StoredObject:
+    def _upload(self, bucket: str, storage_path: str, data: bytes, *, content_type: str) -> StoredObject:
         client = self._require_client()
-        upload.file.seek(0)
-        client.storage.from_(bucket).upload(
-            path=storage_path,
-            file=upload.file,
-            file_options={
-                "content-type": upload.content_type or "application/octet-stream",
-                "upsert": "false",
-            },
-        )
+        try:
+            client.storage.from_(bucket).upload(
+                path=storage_path,
+                file=data,
+                file_options={
+                    "content-type": content_type,
+                    "upsert": "false",
+                },
+            )
+        except Exception as exc:
+            raise StorageServiceError("Media storage upload failed.") from exc
         return StoredObject(
             public_url=self.build_public_url(bucket, storage_path),
             storage_path=storage_path,
+        )
+
+    def upload_upload_file(self, bucket: str, storage_path: str, upload: UploadFile) -> StoredObject:
+        upload.file.seek(0)
+        data = upload.file.read()
+        upload.file.seek(0)
+        return self._upload(
+            bucket,
+            storage_path,
+            data,
+            content_type=upload.content_type or "application/octet-stream",
         )
 
     def upload_bytes(
@@ -66,27 +77,7 @@ class SupabaseStorageService:
         *,
         content_type: str,
     ) -> StoredObject:
-        client = self._require_client()
-        temp_path: str | None = None
-        try:
-            suffix = Path(storage_path).suffix or ".bin"
-            with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as temp_file:
-                temp_file.write(data)
-                temp_path = temp_file.name
-            with open(temp_path, "rb") as handle:
-                client.storage.from_(bucket).upload(
-                    path=storage_path,
-                    file=handle,
-                    file_options={"content-type": content_type, "upsert": "false"},
-                )
-        finally:
-            if temp_path and os.path.exists(temp_path):
-                os.remove(temp_path)
-
-        return StoredObject(
-            public_url=self.build_public_url(bucket, storage_path),
-            storage_path=storage_path,
-        )
+        return self._upload(bucket, storage_path, data, content_type=content_type)
 
     def remove_object(self, bucket: str, storage_path: str | None) -> None:
         if not storage_path:
@@ -97,4 +88,7 @@ class SupabaseStorageService:
                 local_demo_path.unlink()
             return
         client = self._require_client()
-        client.storage.from_(bucket).remove([storage_path])
+        try:
+            client.storage.from_(bucket).remove([storage_path])
+        except Exception as exc:
+            raise StorageServiceError("Media storage deletion failed.") from exc

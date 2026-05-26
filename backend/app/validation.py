@@ -29,7 +29,7 @@ ALLOWED_VIDEO_MIME_TYPES = {
 
 MAX_AVATAR_SIZE_BYTES = 2 * 1024 * 1024
 MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024
-MAX_VIDEO_SIZE_BYTES = 100 * 1024 * 1024
+MAX_VIDEO_SIZE_BYTES = 25 * 1024 * 1024
 MAX_TOTAL_POST_MEDIA_BYTES = 200 * 1024 * 1024
 
 
@@ -48,7 +48,7 @@ def validate_account_id(value: str) -> str:
     value = value.strip()
     if not ACCOUNT_ID_PATTERN.fullmatch(value):
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Account ID must be 8 to 12 digits.",
         )
     return value
@@ -58,7 +58,7 @@ def validate_username(value: str) -> str:
     value = value.strip()
     if not USERNAME_PATTERN.fullmatch(value):
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Username must be 2 to 30 characters and use only letters, numbers, or spaces.",
         )
     return value
@@ -67,7 +67,7 @@ def validate_username(value: str) -> str:
 def validate_password(value: str) -> str:
     if len(value) < 8 or not PASSWORD_HAS_LETTER.search(value) or not PASSWORD_HAS_NUMBER.search(value):
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Password must be at least 8 characters and include letters and numbers.",
         )
     return value
@@ -77,7 +77,7 @@ def validate_bio(value: str | None) -> str | None:
     value = clean_text(value)
     if value and len(value) > 160:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Bio must be 160 characters or fewer.",
         )
     return value
@@ -88,7 +88,7 @@ def parse_category(value: str) -> PostCategory:
         return PostCategory(value)
     except ValueError as exc:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Invalid category.",
         ) from exc
 
@@ -100,12 +100,12 @@ def parse_json_array(value: str | None) -> list[str] | None:
         parsed = json.loads(value)
     except json.JSONDecodeError as exc:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Invalid JSON array field.",
         ) from exc
     if not isinstance(parsed, list) or not all(isinstance(item, str) for item in parsed):
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Expected a JSON array of strings.",
         )
     return parsed
@@ -129,24 +129,24 @@ def _validate_upload(
 ) -> int:
     if not upload.filename:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail=f"{label} filename is required.",
         )
     extension = Path(upload.filename).suffix.lower()
     if extension not in allowed_extensions:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail=f"Invalid {label} file type.",
         )
     if (upload.content_type or "").lower() not in allowed_mime_types:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail=f"Invalid {label} MIME type.",
         )
     size = get_upload_size(upload)
     if size > max_size_bytes:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail=f"{label.capitalize()} file is too large.",
         )
     return size
@@ -180,4 +180,3 @@ def validate_video_upload(upload: UploadFile) -> int:
         max_size_bytes=MAX_VIDEO_SIZE_BYTES,
         label="video",
     )
-

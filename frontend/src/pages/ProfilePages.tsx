@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 
 import { Avatar } from '@/components/Avatar'
 import { PostCard } from '@/components/PostCard'
+import { UploadPicker } from '@/components/UploadPicker'
 import { useAuth } from '@/context/useAuth'
 import {
   changePassword,
@@ -263,14 +264,17 @@ export function EditProfilePage() {
           <span>Bio</span>
           <textarea rows={5} value={bio} onChange={(event) => setBio(event.target.value)} />
         </label>
-        <label className="field">
+        <div className="field">
           <span>Avatar image</span>
-          <input
+          <UploadPicker
             accept=".jpg,.jpeg,.png"
-            type="file"
-            onChange={(event) => setAvatarFile(event.target.files?.[0] ?? null)}
+            actionText="Choose avatar"
+            emptyText="JPG, JPEG, or PNG - up to 2 MB"
+            selectedItems={avatarFile ? [avatarFile.name] : []}
+            onChange={(files) => setAvatarFile(files?.[0] ?? null)}
+            onRemove={() => setAvatarFile(null)}
           />
-        </label>
+        </div>
         {message ? <p className="success-banner">{message}</p> : null}
         {error ? <p className="error-banner">{error}</p> : null}
         <div className="button-row">

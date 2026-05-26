@@ -5,6 +5,7 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { Avatar } from '@/components/Avatar'
 import { CommentThread } from '@/components/CommentThread'
 import { MediaCarousel } from '@/components/MediaCarousel'
+import { UploadPicker } from '@/components/UploadPicker'
 import { categoryList } from '@/data/categories'
 import { useAuth } from '@/context/useAuth'
 import {
@@ -22,6 +23,7 @@ import {
   updatePost,
 } from '@/lib/api'
 import { formatDateTime } from '@/lib/format'
+import { addPostImages, choosePostVideo } from '@/lib/mediaSelection'
 import type { CommentNode, PostCategory, PostDetail } from '@/types/api'
 
 function fileListToArray(fileList: FileList | null) {
@@ -87,8 +89,24 @@ export function CreatePostPage() {
   const [body, setBody] = useState('')
   const [images, setImages] = useState<File[]>([])
   const [video, setVideo] = useState<File | null>(null)
+  const [imageError, setImageError] = useState<string | null>(null)
+  const [videoError, setVideoError] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const handleImageSelection = (files: FileList | null) => {
+    const result = addPostImages(images, fileListToArray(files), video)
+    setImages(result.files)
+    setImageError(result.error)
+  }
+
+  const handleVideoSelection = (files: FileList | null) => {
+    const result = choosePostVideo(images, files?.[0] ?? null)
+    setVideoError(result.error)
+    if (!result.error) {
+      setVideo(result.file)
+    }
+  }
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -143,25 +161,37 @@ export function CreatePostPage() {
             placeholder="Write about the campus atmosphere, study experience, or place you want to share."
           />
         </label>
-        <label className="field">
+        <div className="field">
           <span>Images</span>
-          <input
+          <UploadPicker
             accept=".png,.jpg,.jpeg,.gif"
             multiple
-            type="file"
-            onChange={(event) => setImages(fileListToArray(event.target.files))}
+            actionText="Add images"
+            emptyText="PNG, JPG, JPEG, or GIF - up to 10 MB each"
+            errorText={imageError}
+            selectedItems={images.map((image) => image.name)}
+            onChange={handleImageSelection}
+            onRemove={(index) => {
+              setImages((current) => current.filter((_, itemIndex) => itemIndex !== index))
+              setImageError(null)
+            }}
           />
-          {images.length > 0 ? <small>{images.length} image file(s) selected.</small> : null}
-        </label>
-        <label className="field">
+        </div>
+        <div className="field">
           <span>Video</span>
-          <input
+          <UploadPicker
             accept=".mp4,.webm,.ogg,.mov"
-            type="file"
-            onChange={(event) => setVideo(event.target.files?.[0] ?? null)}
+            actionText="Choose video"
+            emptyText="MP4, WEBM, OGG, or MOV - up to 25 MB"
+            errorText={videoError}
+            selectedItems={video ? [video.name] : []}
+            onChange={handleVideoSelection}
+            onRemove={() => {
+              setVideo(null)
+              setVideoError(null)
+            }}
           />
-          {video ? <small>{video.name}</small> : null}
-        </label>
+        </div>
         {error ? <p className="error-banner">{error}</p> : null}
         <div className="button-row">
           <button className="button button--primary" disabled={isSubmitting} type="submit">
@@ -184,6 +214,8 @@ export function EditPostPage() {
   const [removeVideo, setRemoveVideo] = useState(false)
   const [images, setImages] = useState<File[]>([])
   const [video, setVideo] = useState<File | null>(null)
+  const [imageError, setImageError] = useState<string | null>(null)
+  const [videoError, setVideoError] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -214,6 +246,24 @@ export function EditPostPage() {
 
   const existingImages = useMemo(() => post?.media.filter((item) => item.type === 'image') ?? [], [post])
   const existingVideo = useMemo(() => post?.media.find((item) => item.type === 'video') ?? null, [post])
+  const retainedImageBytes = existingImages
+    .filter((image) => keptImageIds.includes(image.id))
+    .reduce((total, image) => total + image.size_bytes, 0)
+
+  const handleImageSelection = (files: FileList | null) => {
+    const retainedVideoBytes = existingVideo && !removeVideo && !video ? existingVideo.size_bytes : 0
+    const result = addPostImages(images, fileListToArray(files), video, retainedImageBytes + retainedVideoBytes)
+    setImages(result.files)
+    setImageError(result.error)
+  }
+
+  const handleVideoSelection = (files: FileList | null) => {
+    const result = choosePostVideo(images, files?.[0] ?? null, retainedImageBytes)
+    setVideoError(result.error)
+    if (!result.error) {
+      setVideo(result.file)
+    }
+  }
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -306,23 +356,37 @@ export function EditPostPage() {
             <span>Remove current video</span>
           </label>
         ) : null}
-        <label className="field">
+        <div className="field">
           <span>Add images</span>
-          <input
+          <UploadPicker
             accept=".png,.jpg,.jpeg,.gif"
             multiple
-            type="file"
-            onChange={(event) => setImages(fileListToArray(event.target.files))}
+            actionText="Add images"
+            emptyText="PNG, JPG, JPEG, or GIF - up to 10 MB each"
+            errorText={imageError}
+            selectedItems={images.map((image) => image.name)}
+            onChange={handleImageSelection}
+            onRemove={(index) => {
+              setImages((current) => current.filter((_, itemIndex) => itemIndex !== index))
+              setImageError(null)
+            }}
           />
-        </label>
-        <label className="field">
+        </div>
+        <div className="field">
           <span>Replace video</span>
-          <input
+          <UploadPicker
             accept=".mp4,.webm,.ogg,.mov"
-            type="file"
-            onChange={(event) => setVideo(event.target.files?.[0] ?? null)}
+            actionText="Choose video"
+            emptyText="MP4, WEBM, OGG, or MOV - up to 25 MB"
+            errorText={videoError}
+            selectedItems={video ? [video.name] : []}
+            onChange={handleVideoSelection}
+            onRemove={() => {
+              setVideo(null)
+              setVideoError(null)
+            }}
           />
-        </label>
+        </div>
         {error ? <p className="error-banner">{error}</p> : null}
         <div className="button-row">
           <button className="button button--primary" type="submit">

@@ -294,9 +294,7 @@ h3 {
 }
 
 .page-intro p,
-.section-heading p,
-.hero-banner__content p,
-.official-hero__content p {
+.section-heading p {
   margin: 0;
   color: var(--muted);
   font-size: 1.02rem;
@@ -360,6 +358,16 @@ h3 {
 .official-hero__content .eyebrow,
 .category-hero__content .eyebrow {
   color: rgba(255, 231, 204, 0.94);
+}
+
+.hero-banner__content p,
+.official-hero__content p,
+.category-hero__content p {
+  margin: 0;
+  color: rgba(255, 250, 243, 0.96);
+  font-size: 1.02rem;
+  line-height: 1.65;
+  text-shadow: 0 2px 12px rgba(31, 4, 6, 0.72);
 }
 
 .hero-banner__content h1,
@@ -500,8 +508,9 @@ h3 {
 }
 
 .post-card__media {
+  display: block;
   position: relative;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 16 / 9;
   overflow: hidden;
 }
 

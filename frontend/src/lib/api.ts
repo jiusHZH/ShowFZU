@@ -34,6 +34,29 @@ function getInfrastructureErrorMessage(status: number) {
   return null
 }
 
+function getApiErrorMessage(payload: unknown, fallback: string) {
+  if (!payload || typeof payload !== 'object' || !('detail' in payload)) {
+    return fallback
+  }
+
+  const detail = payload.detail
+  if (typeof detail === 'string') {
+    return detail
+  }
+
+  if (Array.isArray(detail)) {
+    const validationError = detail.find(
+      (item): item is { msg: string } =>
+        Boolean(item) && typeof item === 'object' && 'msg' in item && typeof item.msg === 'string',
+    )
+    if (validationError) {
+      return validationError.msg.replace(/^Value error,\s*/u, '')
+    }
+  }
+
+  return fallback
+}
+
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const headers = new Headers(init?.headers)
   const isFormData = init?.body instanceof FormData
@@ -59,11 +82,7 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
 
   if (!response.ok) {
     const infrastructureMessage = getInfrastructureErrorMessage(response.status)
-    const message =
-      infrastructureMessage ??
-      ((typeof payload === 'object' && payload && 'detail' in payload)
-        ? String(payload.detail)
-        : response.statusText || 'Request failed')
+    const message = infrastructureMessage ?? getApiErrorMessage(payload, response.statusText || 'Request failed')
     throw new ApiError(response.status, message)
   }
 

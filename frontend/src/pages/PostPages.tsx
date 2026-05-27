@@ -70,6 +70,18 @@ function buildEditPayload(input: {
   return formData
 }
 
+function ReactionIcon({ type }: { type: 'like' | 'favorite' }) {
+  return type === 'like' ? (
+    <svg aria-hidden="true" className="post-detail__reaction-icon" viewBox="0 0 24 24">
+      <path d="M12 20.6 4.4 13.4a5.2 5.2 0 0 1 0-7.4 5.27 5.27 0 0 1 7.6.14A5.27 5.27 0 0 1 19.6 6a5.2 5.2 0 0 1 0 7.4L12 20.6Z" />
+    </svg>
+  ) : (
+    <svg aria-hidden="true" className="post-detail__reaction-icon" viewBox="0 0 24 24">
+      <path d="m12 3.15 2.72 5.48 6.08.88-4.4 4.27 1.04 6.04L12 16.97l-5.44 2.85 1.04-6.04-4.4-4.27 6.08-.88L12 3.15Z" />
+    </svg>
+  )
+}
+
 function useProtectedAction() {
   const navigate = useNavigate()
   const location = useLocation()
@@ -540,11 +552,25 @@ export function PostDetailPage() {
         <MediaCarousel media={post.media} />
         {post.body ? <div className="post-detail__body"><p>{post.body}</p></div> : null}
         <div className="post-detail__actions">
-          <button className="button button--ghost" onClick={() => void toggleLike()} type="button">
-            {post.is_liked ? 'Unlike' : 'Like'} ({post.like_count})
+          <button
+            aria-pressed={post.is_liked}
+            className={post.is_liked ? 'button post-detail__reaction is-active' : 'button post-detail__reaction'}
+            onClick={() => void toggleLike()}
+            type="button"
+          >
+            <ReactionIcon type="like" />
+            <span>Like</span>
+            <span className="post-detail__reaction-count">{post.like_count}</span>
           </button>
-          <button className="button button--ghost" onClick={() => void toggleFavorite()} type="button">
-            {post.is_favorited ? 'Unfavorite' : 'Favorite'} ({post.favorite_count})
+          <button
+            aria-pressed={post.is_favorited}
+            className={post.is_favorited ? 'button post-detail__reaction is-active' : 'button post-detail__reaction'}
+            onClick={() => void toggleFavorite()}
+            type="button"
+          >
+            <ReactionIcon type="favorite" />
+            <span>Favorite</span>
+            <span className="post-detail__reaction-count">{post.favorite_count}</span>
           </button>
           <span>{post.comment_count} comments</span>
         </div>

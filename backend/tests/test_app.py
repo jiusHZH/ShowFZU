@@ -2,9 +2,13 @@ from __future__ import annotations
 
 import pytest
 from pydantic import ValidationError
+from sqlalchemy import text
 
 from app.config import Settings
-from app.database import normalize_database_url
+from app.database import Base, build_engine, normalize_database_url
+from app.enums import PostCategory
+from app.models import Post, User
+from app.security import hash_password, hash_security_answer
 from app.services.storage import SupabaseStorageService
 from app.validation import MAX_VIDEO_SIZE_BYTES
 
@@ -67,6 +71,41 @@ def test_normalizes_supabase_postgres_url_to_psycopg_driver() -> None:
         normalize_database_url("postgresql://user:password@example.test:5432/postgres")
         == "postgresql+psycopg://user:password@example.test:5432/postgres"
     )
+
+
+def test_post_category_is_stored_as_public_value(tmp_path) -> None:
+    database_path = tmp_path / "enum-storage.db"
+    engine = build_engine(f"sqlite:///{database_path.as_posix()}")
+    Base.metadata.create_all(engine)
+
+    with engine.begin() as connection:
+        connection.execute(
+            User.__table__.insert(),
+            {
+                "id": "u_enum_probe",
+                "account_id": "34567890",
+                "username": "Enum Probe",
+                "password_hash": hash_password("Password123"),
+                "security_question": "Question?",
+                "security_answer_hash": hash_security_answer("Answer"),
+            },
+        )
+        connection.execute(
+            Post.__table__.insert(),
+            {
+                "id": "p_enum_probe",
+                "author_id": "u_enum_probe",
+                "title": "Enum storage probe",
+                "body": "Probe body",
+                "category": PostCategory.DIGITAL_MEMORY,
+            },
+        )
+        stored_category = connection.execute(
+            text("select category from posts where id = :post_id"),
+            {"post_id": "p_enum_probe"},
+        ).scalar_one()
+
+    assert stored_category == "Digital Memory"
 
 
 def test_explicit_login_method_allows_numeric_username(client) -> None:

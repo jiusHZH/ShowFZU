@@ -8,8 +8,13 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base, utc_now
 from app.enums import MediaType, PostCategory
 
-category_enum = Enum(PostCategory, name="post_category", native_enum=False)
-media_type_enum = Enum(MediaType, name="media_type", native_enum=False)
+
+def enum_values(enum_cls: type[PostCategory] | type[MediaType]) -> list[str]:
+    return [item.value for item in enum_cls]
+
+
+category_enum = Enum(PostCategory, name="post_category", native_enum=False, values_callable=enum_values)
+media_type_enum = Enum(MediaType, name="media_type", native_enum=False, values_callable=enum_values)
 
 
 class User(Base):

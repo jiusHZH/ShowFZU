@@ -194,7 +194,7 @@ export function CreatePostPage() {
           <UploadPicker
             accept=".mp4,.webm,.ogg,.mov"
             actionText="Choose video"
-            emptyText="MP4, WEBM, OGG, or MOV - up to 25 MB"
+            emptyText="MP4, WEBM, OGG, or MOV - up to 50 MB"
             errorText={videoError}
             selectedItems={video ? [video.name] : []}
             onChange={handleVideoSelection}
@@ -389,7 +389,7 @@ export function EditPostPage() {
           <UploadPicker
             accept=".mp4,.webm,.ogg,.mov"
             actionText="Choose video"
-            emptyText="MP4, WEBM, OGG, or MOV - up to 25 MB"
+            emptyText="MP4, WEBM, OGG, or MOV - up to 50 MB"
             errorText={videoError}
             selectedItems={video ? [video.name] : []}
             onChange={handleVideoSelection}

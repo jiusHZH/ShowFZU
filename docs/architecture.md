@@ -238,7 +238,7 @@ Rules:
 - Images have sortable order.
 - At most 1 video per post.
 - Each image <= 10MB.
-- Video <= 25MB.
+- Video <= 50MB.
 - Total media size per post <= 200MB.
 
 ### comments
@@ -432,7 +432,7 @@ Post media validation:
 - Image types: png, jpg, jpeg, gif.
 - Video types: mp4, webm, ogg, mov.
 - Image size <= 10MB.
-- Video size <= 25MB.
+- Video size <= 50MB.
 - Total media size per post <= 200MB.
 - At most 1 video per post.
 
@@ -589,7 +589,7 @@ Demo import should:
 - Generate video thumbnails from middle frames.
 - Insert demo users, posts, media, comments, likes, and favorites as needed for testing.
 
-Demo videos must follow the same 25MB video limit as user uploads.
+Demo videos must follow the same 50MB video limit as user uploads.
 
 ## 13. Security And Validation
 
@@ -638,7 +638,7 @@ Storage deployment:
 
 - Buckets are public.
 - Backend manages write and delete access.
-- The post media bucket must permit files up to at least 25MB so accepted videos can be stored.
+- The post media bucket must permit files up to at least 50MB so accepted videos can be stored.
 
 ## 15. Open Implementation Details
 

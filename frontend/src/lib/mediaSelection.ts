@@ -1,7 +1,7 @@
 const MEGABYTE = 1024 * 1024
 
 export const MAX_IMAGE_SIZE_BYTES = 10 * MEGABYTE
-export const MAX_VIDEO_SIZE_BYTES = 25 * MEGABYTE
+export const MAX_VIDEO_SIZE_BYTES = 50 * MEGABYTE
 export const MAX_TOTAL_POST_MEDIA_BYTES = 200 * MEGABYTE
 
 const IMAGE_EXTENSIONS = new Set(['.png', '.jpg', '.jpeg', '.gif'])
@@ -68,7 +68,7 @@ export function choosePostVideo(images: File[], selected: File | null, retainedB
     return { file: null, error: `${selected.name} was not added. Use MP4, WEBM, OGG, or MOV video only.` }
   }
   if (selected.size > MAX_VIDEO_SIZE_BYTES) {
-    return { file: null, error: `${selected.name} was not added because it exceeds the 25 MB video limit.` }
+    return { file: null, error: `${selected.name} was not added because it exceeds the 50 MB video limit.` }
   }
   if (mediaTotalBytes(images, selected, retainedBytes) > MAX_TOTAL_POST_MEDIA_BYTES) {
     return {

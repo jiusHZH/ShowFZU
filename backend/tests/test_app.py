@@ -208,8 +208,8 @@ def test_authenticated_content_flow(client, sample_image_bytes: bytes) -> None:
     assert blocked_like.status_code == 401
 
 
-def test_rejects_video_over_25_mb_before_upload(client) -> None:
-    assert MAX_VIDEO_SIZE_BYTES == 25 * 1024 * 1024
+def test_rejects_video_over_50_mb_before_upload(client) -> None:
+    assert MAX_VIDEO_SIZE_BYTES == 50 * 1024 * 1024
     register_user(client, account_id="23456789", username="Video Tester")
     login_user(client, method="username", identifier="Video Tester")
 

@@ -580,7 +580,7 @@ export function PostDetailPage() {
         <div className="section-heading">
           <div>
             <span className="eyebrow">Comments</span>
-            <h2>Two levels only: main comments and one layer of replies.</h2>
+            <h2>Share your ideas with the campus community.</h2>
           </div>
         </div>
         <form className="comment-composer" onSubmit={(event) => void handleCommentSubmit(event)}>

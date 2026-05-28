@@ -12,10 +12,12 @@ import { formatDate } from '@/lib/format'
 import type { OfficialGuideData, PaginatedPosts, PostSummary, PublicAuthorProfile } from '@/types/api'
 
 const featurePoints = [
-  { label: 'Main Gate', slug: 'campus-landmark' },
-  { label: 'Library', slug: 'study-space' },
-  { label: 'Fuyou Pavilion', slug: 'study-space' },
-  { label: 'Campus Scenery', slug: 'campus-landmark' },
+  { label: 'Campus Landmark', slug: 'campus-landmark' },
+  { label: 'Study Space', slug: 'study-space' },
+  { label: 'Student Life', slug: 'student-life' },
+  { label: 'Food and Cafe', slug: 'food-and-cafe' },
+  { label: 'Sports and Leisure', slug: 'sports-and-leisure' },
+  { label: 'Digital Memory', slug: 'digital-memory' },
 ]
 
 export function HomePage() {

@@ -465,10 +465,11 @@ h3 {
 }
 
 .hero-banner__points {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(8.5rem, 1fr));
   gap: 0.7rem;
   margin-top: 1.25rem;
+  max-width: 37rem;
 }
 
 .hero-banner__points a {
@@ -477,6 +478,7 @@ h3 {
   background: rgba(255, 248, 248, 0.12);
   border: 1px solid rgba(255, 238, 214, 0.24);
   color: #fffaf8;
+  text-align: center;
 }
 
 .hero-banner__points a:hover,
@@ -1660,6 +1662,11 @@ h3 {
     min-width: 0;
     width: 100%;
   }
+
+  .hero-banner__points {
+    grid-template-columns: repeat(2, minmax(8.5rem, 1fr));
+    max-width: 26rem;
+  }
 }
 
 @media (max-width: 720px) {
@@ -1691,6 +1698,11 @@ h3 {
   .official-hero__content,
   .category-hero__content {
     padding: 1.4rem;
+  }
+
+  .hero-banner__points {
+    grid-template-columns: 1fr;
+    max-width: 18rem;
   }
 
   .post-card__footer,

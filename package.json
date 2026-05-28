@@ -9,6 +9,9 @@
     "install:frontend": "npm --workspace frontend install",
     "dev:frontend": "npm --workspace frontend run dev",
     "seed:demo": "cmd /c \"cd backend && .\\.venv\\Scripts\\python ..\\scripts\\seed_demo_content.py\"",
+    "seed:production:plan": "cmd /c \"cd backend && .\\.venv\\Scripts\\python ..\\scripts\\seed_production_from_sqlite.py plan\"",
+    "seed:production": "cmd /c \"cd backend && .\\.venv\\Scripts\\python ..\\scripts\\seed_production_from_sqlite.py seed --yes\"",
+    "seed:production:cleanup": "cmd /c \"cd backend && .\\.venv\\Scripts\\python ..\\scripts\\seed_production_from_sqlite.py cleanup --yes\"",
     "build:frontend": "npm --workspace frontend run build",
     "lint:frontend": "npm --workspace frontend run lint"
   },

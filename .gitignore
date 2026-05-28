@@ -21,6 +21,7 @@ backend/.coverage
 backend/htmlcov/
 backend/showfzu.dev.db
 backend/.pytest_*/
+backend/.production-seed-cache/
 
 coverage/
 .playwright-mcp/

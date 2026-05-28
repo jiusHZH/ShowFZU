@@ -53,7 +53,12 @@ def _set_session_cookie(response: Response, settings: Settings, token: str) -> N
 
 
 def _clear_session_cookie(response: Response, settings: Settings) -> None:
-    response.delete_cookie(key=settings.session_cookie_name, path="/", samesite="lax")
+    response.delete_cookie(
+        key=settings.session_cookie_name,
+        path="/",
+        samesite="lax",
+        secure=settings.secure_cookies or settings.is_production,
+    )
 
 
 def _build_auth_response(message: str, user: User, db: Session) -> AuthResponse:

@@ -15,6 +15,8 @@ def create_app(
     storage_service: SupabaseStorageService | None = None,
 ) -> FastAPI:
     settings = settings or get_settings()
+    if settings.is_production and settings.database_url.strip().lower().startswith("sqlite"):
+        raise RuntimeError("Production cannot use SQLite. Set SHOWFZU_DATABASE_URL to Supabase Postgres.")
     if settings.database_url.startswith("sqlite"):
         import app.models  # noqa: F401
 

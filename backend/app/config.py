@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import json
 from functools import lru_cache
+from typing import Self
 
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -43,6 +44,22 @@ class Settings(BaseSettings):
                 return json.loads(trimmed)
             return [item.strip() for item in value.split(",") if item.strip()]
         return value
+
+    @model_validator(mode="after")
+    def validate_production_config(self) -> Self:
+        if not self.is_production:
+            return self
+
+        if self.database_url.strip().lower().startswith("sqlite"):
+            raise ValueError("Production requires SHOWFZU_DATABASE_URL to point to Supabase Postgres.")
+        if not self.session_secret or self.session_secret == "replace-me":
+            raise ValueError("Production requires SHOWFZU_SESSION_SECRET to be set to a strong secret.")
+        if not self.supabase_url:
+            raise ValueError("Production requires SHOWFZU_SUPABASE_URL.")
+        if not self.supabase_service_key:
+            raise ValueError("Production requires SHOWFZU_SUPABASE_SERVICE_KEY for backend Storage access.")
+
+        return self
 
     @property
     def is_production(self) -> bool:

@@ -1,5 +1,11 @@
 from __future__ import annotations
 
+import pytest
+from pydantic import ValidationError
+
+from app.config import Settings
+from app.database import normalize_database_url
+from app.services.storage import SupabaseStorageService
 from app.validation import MAX_VIDEO_SIZE_BYTES
 
 
@@ -29,6 +35,38 @@ def login_user(client, *, method: str, identifier: str, password: str = "Passwor
     )
     assert response.status_code == 200, response.text
     return response.json()
+
+
+def test_production_rejects_sqlite_database_url() -> None:
+    with pytest.raises(ValidationError, match="Supabase Postgres"):
+        Settings(
+            env="production",
+            database_url="sqlite:///prod.db",
+            session_secret="strong-test-secret",
+            supabase_url="https://example.supabase.co",
+            supabase_service_key="test-service-key",
+        )
+
+
+def test_production_storage_does_not_resolve_local_demo_paths() -> None:
+    settings = Settings(
+        env="production",
+        database_url="postgresql+psycopg://user:password@example.test:5432/postgres",
+        session_secret="strong-test-secret",
+        supabase_url="https://example.supabase.co",
+        supabase_service_key="test-service-key",
+    )
+    service = object.__new__(SupabaseStorageService)
+    service.settings = settings
+
+    assert service._resolve_local_demo_path("local-demo/demo-posts/example.jpg") is None
+
+
+def test_normalizes_supabase_postgres_url_to_psycopg_driver() -> None:
+    assert (
+        normalize_database_url("postgresql://user:password@example.test:5432/postgres")
+        == "postgresql+psycopg://user:password@example.test:5432/postgres"
+    )
 
 
 def test_explicit_login_method_allows_numeric_username(client) -> None:

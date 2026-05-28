@@ -1,0 +1,45 @@
+services:
+  - type: web
+    name: showfzu-api
+    runtime: python
+    rootDir: backend
+    plan: free
+    buildCommand: pip install -e .
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: SHOWFZU_APP_NAME
+        value: ShowFZU API
+      - key: SHOWFZU_ENV
+        value: production
+      - key: SHOWFZU_SESSION_COOKIE_NAME
+        value: showfzu_session
+      - key: SHOWFZU_SESSION_MAX_AGE_SECONDS
+        value: "604800"
+      - key: SHOWFZU_SECURE_COOKIES
+        value: "true"
+      - key: SHOWFZU_STORAGE_POSTS_BUCKET
+        value: post-media
+      - key: SHOWFZU_STORAGE_AVATARS_BUCKET
+        value: avatars
+      - key: SHOWFZU_STORAGE_GUIDE_BUCKET
+        value: official-guide
+      - key: SHOWFZU_FFMPEG_PATH
+        value: ffmpeg
+      - key: SHOWFZU_FFPROBE_PATH
+        value: ffprobe
+      - key: SHOWFZU_DATABASE_URL
+        sync: false
+      - key: SHOWFZU_SESSION_SECRET
+        sync: false
+      - key: SHOWFZU_CORS_ORIGINS
+        sync: false
+      - key: SHOWFZU_PUBLIC_BASE_URL
+        sync: false
+      - key: SHOWFZU_SUPABASE_URL
+        sync: false
+      - key: SHOWFZU_SUPABASE_SERVICE_KEY
+        sync: false

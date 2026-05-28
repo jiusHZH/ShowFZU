@@ -27,6 +27,8 @@ class SupabaseStorageService:
             self.client = create_client(settings.supabase_url, settings.supabase_service_key)
 
     def _resolve_local_demo_path(self, storage_path: str | None) -> Path | None:
+        if self.settings.is_production:
+            return None
         if not storage_path or not storage_path.startswith("local-demo/"):
             return None
         relative_path = storage_path.removeprefix("local-demo/")

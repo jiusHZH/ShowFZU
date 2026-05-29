@@ -112,6 +112,29 @@ def _delete_post_media_storage(storage_service: SupabaseStorageService, media: P
         _delete_storage_object(storage_service, bucket, media.thumbnail_storage_path)
 
 
+def _try_upload_video_thumbnail(
+    storage_service: SupabaseStorageService,
+    upload: UploadFile,
+    storage_path: str,
+) -> tuple[str | None, str | None]:
+    try:
+        thumbnail_bytes = extract_video_thumbnail_bytes(
+            upload,
+            ffmpeg_path=storage_service.settings.ffmpeg_path,
+            ffprobe_path=storage_service.settings.ffprobe_path,
+        )
+        stored_thumbnail = storage_service.upload_bytes(
+            storage_service.settings.storage_posts_bucket,
+            storage_path,
+            thumbnail_bytes,
+            content_type="image/jpeg",
+        )
+    except Exception:
+        return None, None
+
+    return stored_thumbnail.public_url, stored_thumbnail.storage_path
+
+
 def _build_interaction_state(db: Session, model, post_id: str, active: bool) -> InteractionState:
     count = int(db.scalar(select(func.count(model.id)).where(model.post_id == post_id)) or 0)
     return InteractionState(active=active, count=count)
@@ -239,26 +262,21 @@ def create_post(
                 normalized_video,
             )
             created_objects.append(video_storage_path)
-            thumbnail_bytes = extract_video_thumbnail_bytes(
+            thumbnail_url, stored_thumbnail_path = _try_upload_video_thumbnail(
+                storage_service,
                 normalized_video,
-                ffmpeg_path=storage_service.settings.ffmpeg_path,
-                ffprobe_path=storage_service.settings.ffprobe_path,
-            )
-            stored_thumbnail = storage_service.upload_bytes(
-                storage_service.settings.storage_posts_bucket,
                 thumbnail_storage_path,
-                thumbnail_bytes,
-                content_type="image/jpeg",
             )
-            created_objects.append(thumbnail_storage_path)
+            if stored_thumbnail_path:
+                created_objects.append(stored_thumbnail_path)
             post.media.append(
                 PostMedia(
                     id=create_public_id("m"),
                     type=MediaType.VIDEO,
                     url=stored_video.public_url,
                     storage_path=stored_video.storage_path,
-                    thumbnail_url=stored_thumbnail.public_url,
-                    thumbnail_storage_path=stored_thumbnail.storage_path,
+                    thumbnail_url=thumbnail_url,
+                    thumbnail_storage_path=stored_thumbnail_path,
                     mime_type=normalized_video.content_type or "application/octet-stream",
                     size_bytes=video_size,
                     sort_order=len(normalized_images),
@@ -378,26 +396,21 @@ def update_post(
                 normalized_video,
             )
             created_paths.append(video_storage_path)
-            thumbnail_bytes = extract_video_thumbnail_bytes(
+            thumbnail_url, stored_thumbnail_path = _try_upload_video_thumbnail(
+                storage_service,
                 normalized_video,
-                ffmpeg_path=storage_service.settings.ffmpeg_path,
-                ffprobe_path=storage_service.settings.ffprobe_path,
-            )
-            stored_thumbnail = storage_service.upload_bytes(
-                storage_service.settings.storage_posts_bucket,
                 thumbnail_storage_path,
-                thumbnail_bytes,
-                content_type="image/jpeg",
             )
-            created_paths.append(thumbnail_storage_path)
+            if stored_thumbnail_path:
+                created_paths.append(stored_thumbnail_path)
             replacement_video = PostMedia(
                 id=create_public_id("m"),
                 post_id=post.id,
                 type=MediaType.VIDEO,
                 url=stored_video.public_url,
                 storage_path=stored_video.storage_path,
-                thumbnail_url=stored_thumbnail.public_url,
-                thumbnail_storage_path=stored_thumbnail.storage_path,
+                thumbnail_url=thumbnail_url,
+                thumbnail_storage_path=stored_thumbnail_path,
                 mime_type=normalized_video.content_type or "application/octet-stream",
                 size_bytes=new_video_size,
                 sort_order=len(kept_images) + len(new_media),

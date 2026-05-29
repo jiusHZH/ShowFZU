@@ -208,6 +208,38 @@ def test_authenticated_content_flow(client, sample_image_bytes: bytes) -> None:
     assert blocked_like.status_code == 401
 
 
+def test_mixed_media_post_survives_video_thumbnail_failure(client, sample_image_bytes: bytes, monkeypatch) -> None:
+    register_user(client, account_id="45678901", username="Mixed Media")
+    login_user(client, method="username", identifier="Mixed Media")
+
+    def fail_thumbnail(*args, **kwargs):
+        raise RuntimeError("thumbnail probe failure")
+
+    monkeypatch.setattr("app.routers.posts.extract_video_thumbnail_bytes", fail_thumbnail)
+
+    response = client.post(
+        "/api/posts",
+        data={
+            "title": "Images with a video",
+            "category": "Digital Memory",
+            "body": "The images should keep the post publishable when video thumbnailing fails.",
+        },
+        files=[
+            ("images", ("one.png", sample_image_bytes, "image/png")),
+            ("images", ("two.png", sample_image_bytes, "image/png")),
+            ("video", ("clip.mp4", b"not a real mp4", "video/mp4")),
+        ],
+    )
+
+    assert response.status_code == 201, response.text
+    post = response.json()
+    assert post["image_count"] == 2
+    assert post["has_video"] is True
+    assert post["cover_source"] == "image"
+    video = next(item for item in post["media"] if item["type"] == "video")
+    assert video["thumbnail_url"] is None
+
+
 def test_rejects_video_over_50_mb_before_upload(client) -> None:
     assert MAX_VIDEO_SIZE_BYTES == 50 * 1024 * 1024
     register_user(client, account_id="23456789", username="Video Tester")

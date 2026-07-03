@@ -1,15 +1,15 @@
 # ShowFZU
 
-ShowFZU 是一个面向福州大学校园展示与社区互动的网站项目。网站界面和默认演示内容按产品需求使用英文，功能包括 Official FZU Introduction 静态展示页、公开帖子浏览与搜索、分类浏览、自建账号注册和登录、点赞、收藏、评论以及个人资料管理。
+ShowFZU is an English-language campus showcase and community website for Fuzhou University. It includes a static Official FZU Introduction exhibition, public post browsing and search, category feeds, custom account registration and login, likes, favorites, comments, and profile management.
 
-## 技术栈
+## Technology Stack
 
-- 前端：React、Vite、TypeScript、React Router
-- 后端：Python 3.12+、FastAPI、SQLAlchemy、Alembic
-- 生产数据库和媒体存储：Supabase Postgres、Supabase Storage
-- 认证：由 FastAPI 自建 HTTP-only cookie session，session 有效期为 7 天；不使用 Supabase Auth
+- Frontend: React, Vite, TypeScript, and React Router
+- Backend: Python 3.12+, FastAPI, SQLAlchemy, and Alembic
+- Production database and media storage: Supabase Postgres and Supabase Storage
+- Authentication: a custom FastAPI HTTP-only cookie session with a seven-day lifetime; Supabase Auth is not used
 
-仓库为 monorepo：
+This repository is a monorepo:
 
 ```text
 ShowFZU/
@@ -20,42 +20,42 @@ ShowFZU/
   scripts/      static asset and demo content generation scripts
 ```
 
-产品与架构规则以 `docs/requirements.md` 和 `docs/architecture.md` 为准。
+`docs/requirements.md` and `docs/architecture.md` are the sources of truth for product and architecture decisions.
 
-## 本地运行所需环境
+## Local Development Requirements
 
-常规本地开发必须准备：
+Standard local development requires:
 
-- Windows PowerShell 或命令提示符
-- Node.js 与 `npm`
-- Python 3.12 或更高版本
+- Windows PowerShell or Command Prompt
+- Node.js and `npm`
+- Python 3.12 or later
 
-下列内容不是通过 `pip` 或 `npm` 就能完整解决的依赖，需要按功能手动准备：
+The following dependencies require additional setup:
 
-- 系统命令 `ffmpeg` 与 `ffprobe`：视频缩略图处理、从 `resource/` 生成演示视频帖子时需要。安装后需确保它们在系统 `PATH` 中可执行。
-- Supabase 项目凭据：真实图片、视频和头像上传由后端写入 Supabase Storage，因此需要手工配置密钥。本仓库不提供密钥，也不得提交密钥。
-- `resource/` 下的原始 Word 文档与媒体：仅在重新生成官方展示素材或演示帖子媒体时需要。
+- `ffmpeg` and `ffprobe`: required for video thumbnail generation and for generating demo video posts from `resource/`. Both commands must be available on the system `PATH`.
+- Supabase project credentials: the backend uploads real images, videos, and avatars to Supabase Storage. Credentials must be configured locally and must never be committed.
+- Source Word documents and media under `resource/`: required only when regenerating official showcase assets or demo post media.
 
-Python 依赖清单采用标准文件名 `requirements.txt`，可直接供 `pip` 使用。
+Python dependencies are listed in the standard root-level `requirements.txt` file.
 
-## 第一次本地安装
+## First-Time Local Setup
 
-在 Windows 中操作：
+On Windows:
 
-1. 按 `Win + R`，输入 `cmd`，回车。
-2. 进入项目根目录。请在资源管理器中找到项目实际位置，并替换下面的示例路径：
+1. Press `Win + R`, enter `cmd`, and press Enter.
+2. Open the project root. Replace the example path with the actual location:
 
    ```bat
    cd C:\<project-parent-directory>\ShowFZU
    ```
 
-3. 安装前端依赖：
+3. Install frontend dependencies:
 
    ```bat
    npm install
    ```
 
-4. 如果本机还没有可用的 `backend\.venv`，创建后端 Python 虚拟环境并安装依赖：
+4. If `backend\.venv` does not exist, create the backend virtual environment and install its dependencies:
 
    ```bat
    py -3.12 -m venv backend\.venv
@@ -63,112 +63,112 @@ Python 依赖清单采用标准文件名 `requirements.txt`，可直接供 `pip`
    backend\.venv\Scripts\python.exe -m pip install -r requirements.txt
    ```
 
-5. 创建本地后端配置文件：
+5. Create the local backend configuration:
 
    ```bat
    copy backend\.env.example backend\.env
    ```
 
-默认开发配置使用本地 SQLite 数据库，足以启动网站、浏览页面和进行基础账号/帖子数据测试。生产环境不得使用示例中的占位 session secret。
+The default development configuration uses a local SQLite database. It is sufficient for starting the website, browsing pages, and testing basic account and post flows. Never use the placeholder session secret in production.
 
-## 如何在本地启动
+## Starting the Application Locally
 
-第一个终端启动后端：
+Start the backend in the first terminal:
 
-1. 按 `Win + R`，输入 `cmd`，回车。
-2. 进入项目根目录：
+1. Press `Win + R`, enter `cmd`, and press Enter.
+2. Open the project root:
 
    ```bat
    cd C:\<project-parent-directory>\ShowFZU
    ```
 
-3. 启动 FastAPI 后端：
+3. Start the FastAPI backend:
 
    ```bat
    cd backend
    .\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
    ```
 
-第二个终端启动前端：
+Start the frontend in a second terminal:
 
-4. 再打开一个命令提示符窗口，并再次进入项目根目录：
+4. Open another Command Prompt window and return to the project root:
 
    ```bat
    cd C:\<project-parent-directory>\ShowFZU
    ```
 
-5. 启动 Vite 前端：
+5. Start the Vite frontend:
 
    ```bat
    npm --workspace frontend run dev -- --host 127.0.0.1 --port 5173
    ```
 
-6. 在浏览器中访问：
+6. Open the application:
 
    ```text
    http://127.0.0.1:5173/
    ```
 
-后端健康检查地址：
+Backend health check:
 
 ```text
 http://127.0.0.1:8000/api/health
 ```
 
-## 初始化演示内容
+## Initializing Demo Content
 
-仓库包含脚本，可根据提供的素材文档和媒体文件生成英文演示帖子及官方展示页素材。
+The repository includes scripts that generate English demo posts and official showcase assets from the provided documents and media.
 
-如需向本地 SQLite 数据库写入演示账号和帖子，在项目根目录运行：
+To seed demo accounts and posts into the local SQLite database, run this command from the project root:
 
 ```bat
 cd C:\<project-parent-directory>\ShowFZU
 npm run seed:demo
 ```
 
-演示种子流程会处理 `resource/` 中的视频，因此运行该命令前必须自行安装 `ffmpeg` 与 `ffprobe` 并加入 `PATH`。
+The demo seed process handles videos from `resource/`, so `ffmpeg` and `ffprobe` must be installed and available on `PATH`.
 
-如需重新生成 Official FZU Introduction 静态素材：
+To regenerate static assets for the Official FZU Introduction:
 
 ```bat
 cd C:\<project-parent-directory>\ShowFZU
 backend\.venv\Scripts\python.exe scripts\build_official_guide.py
 ```
 
-## 媒体上传与 Supabase 配置
+## Media Uploads and Supabase
 
-本地 SQLite 模式足以启动应用并浏览静态或演示媒体。真实用户上传的媒体必须经过 `frontend -> FastAPI -> Supabase Storage` 链路，不允许前端直接写入 Supabase。
+Local SQLite mode is sufficient for starting the application and browsing static or demo media. Real user media must follow the `frontend -> FastAPI -> Supabase Storage` path. The frontend must never write directly to Supabase.
 
-如需启用真实上传，请手工配置 `backend\.env`：
+To enable real uploads, configure `backend\.env` manually:
 
 ```env
-SHOWFZU_SUPABASE_URL=https://epkgspfhfwlsxsesteof.supabase.co
-SHOWFZU_SUPABASE_SERVICE_KEY=<your-service-role-key>
+SHOWFZU_SUPABASE_URL=<your-supabase-project-url>
+SHOWFZU_SUPABASE_SERVICE_KEY=<your-backend-only-service-role-or-secret-key>
 SHOWFZU_STORAGE_POSTS_BUCKET=post-media
 SHOWFZU_STORAGE_AVATARS_BUCKET=avatars
 SHOWFZU_STORAGE_GUIDE_BUCKET=official-guide
 ```
 
-注意事项：
+Important:
 
-- 不得提交 `backend\.env`、Supabase service role key、数据库密码或 session secret。
-- 使用上传功能前，需要在关联的 Supabase 项目中准备对应 Storage bucket。
-- Storage bucket 面向公开可见媒体，但写入和删除操作只能由后端控制。
-- 如部署到 Supabase Postgres，需要通过 `SHOWFZU_DATABASE_URL` 配置数据库连接，并在目标环境执行 Alembic migration。
+- Never commit `backend\.env`, a Supabase service role or secret key, a database password, or a session secret.
+- Create the required Supabase Storage buckets before testing uploads.
+- Storage buckets provide public read access to media, while all writes and deletions remain backend-only.
+- A Supabase Postgres deployment requires `SHOWFZU_DATABASE_URL` and the latest Alembic migration on the target database.
 
-## 如何停止本地服务
+## Stopping Local Services
 
-如果前端与后端分别在两个终端窗口中运行，请在每个终端窗口中按 `Ctrl + C`。
+If the frontend and backend are running in separate terminal windows, press `Ctrl + C` in each window.
 
-如需在 Windows 中查看是否仍有服务占用端口：
+To check whether either local port is still in use on Windows:
 
 ```powershell
 Get-NetTCPConnection -State Listen -LocalPort 5173,8000 -ErrorAction SilentlyContinue
 ```
 
-## 校验命令
+## Validation
 
-在项目根目录执行：
+Run these commands from the project root:
 
 ```bat
 npm run lint:frontend

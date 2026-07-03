@@ -30,6 +30,9 @@ backend/.production-seed-cache/
 coverage/
 .playwright-mcp/
 *.tgz
+*.log
+*.pid
 backend/.local-browser.db
+backend/tmp-runtime/
 frontend/public/demo-posts/
 resource/

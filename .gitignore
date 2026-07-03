@@ -32,3 +32,4 @@ coverage/
 *.tgz
 backend/.local-browser.db
 frontend/public/demo-posts/
+resource/

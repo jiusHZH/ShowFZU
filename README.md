@@ -16,7 +16,7 @@ ShowFZU/
   frontend/     React application
   backend/      FastAPI application and migrations
   docs/         product and architecture requirements
-  resource/     source documents, photos, and videos
+  resource/     optional local source documents and media (not included)
   scripts/      static asset and demo content generation scripts
 ```
 
@@ -34,7 +34,7 @@ The following dependencies require additional setup:
 
 - `ffmpeg` and `ffprobe`: required for video thumbnail generation and for generating demo video posts from `resource/`. Both commands must be available on the system `PATH`.
 - Supabase project credentials: the backend uploads real images, videos, and avatars to Supabase Storage. Credentials must be configured locally and must never be committed.
-- Source Word documents and media under `resource/`: required only when regenerating official showcase assets or demo post media.
+- Source Word documents and media under `resource/`: optional local inputs required only when regenerating official showcase assets or demo post media. They are excluded from the source submission because of their size.
 
 Python dependencies are listed in the standard root-level `requirements.txt` file.
 
@@ -117,7 +117,7 @@ http://127.0.0.1:8000/api/health
 
 ## Initializing Demo Content
 
-The repository includes scripts that generate English demo posts and official showcase assets from the provided documents and media.
+The repository includes scripts that generate English demo posts and official showcase assets when the optional source documents and media are available under `resource/`.
 
 To seed demo accounts and posts into the local SQLite database, run this command from the project root:
 
